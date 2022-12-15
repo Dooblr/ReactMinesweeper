@@ -1,0 +1,79 @@
+.App{
+  background-color: rgb(26, 32, 52);
+  width:100vw;
+  min-height:100vh;
+  display:flex;
+  justify-content: center;
+}
+
+.app-container{
+  margin-top: 30vh;
+}
+
+.cell-button{
+  width:2rem !important;
+  height:2rem !important;
+  // margin:0;
+  padding:0;
+}
+
+.mine-img{
+  position: fixed;
+  width:1.5rem;
+  transform: translate(-.75rem,-.75rem);
+}
+
+.flag-img{
+  position: fixed;
+  width:1.5rem;
+  transform: translate(-.75rem,-.75rem);
+}
+
+.explosion-img{
+  position: fixed;
+  width:1.5rem;
+  transform: translate(-.75rem,-.75rem);
+}
+
+.cell-number{
+  position: fixed;
+  width:1.5rem;
+  transform: translate(.15rem,-.7rem);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: large;
+  font-weight: 900;
+}
+
+.cell-clicked{
+  position:fixed;
+  background-color: gray;
+  border-radius: .1rem;
+  // top:0;
+  // left:0;
+  width:1.5rem;
+  height:1.5rem;
+  transform: translate(.125rem,-.75rem);
+}
+
+// #game-over-text{
+//   color: beige;
+//   background:rgba(0,0,0,0.3);
+//   padding:1rem;
+//   padding-inline: 2rem;
+//   border-radius: 1rem;
+// }
+
+// #new-game-button{
+//   display: block;
+//   margin: auto;
+//   font-size: 1.5rem;
+//   background:transparent;
+//   border: 1px solid rgb(1, 255, 153);
+//   color:rgb(155, 255, 200);
+//   border-radius: .5rem;
+//   padding:.5rem;
+
+//   :hover{
+//     background:blue
+//   }
+// }
