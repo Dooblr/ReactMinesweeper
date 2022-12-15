@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useGameStateStore } from '../../Stores/Stores'
+import { addLeadingZeros } from '../../utils'
 import './GameHeader.css'
 
 export function GameHeader(){
@@ -7,7 +8,7 @@ export function GameHeader(){
   // State ================================================================== //
   
   const [isGameOver, setGameOver] = useGameStateStore((state:any) => [state.isGameOver, state.setGameOver])
-  const [setNewGame] = useGameStateStore((state:any) => [state.setNewGame])
+  const [newGame,setNewGame] = useGameStateStore((state:any) => [state.newGame, state.setNewGame])
 
   // Methods ================================================================== //
 
@@ -16,14 +17,21 @@ export function GameHeader(){
 
   const [isActive, setIsActive] = useState(false);
 
-  // useEffect(()=>{
-    
-    
-    
-  // },[])
+  useEffect(()=>{
+    const interval = setInterval(() => {
+      if (timeElapsedSeconds > 58){
+        setTimeElapsedSeconds(0)
+        setTimeElapsedMinues(timeElapsedMinutes + 1)
+      } else {
+        setTimeElapsedSeconds(timeElapsedSeconds + 1)
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  },[timeElapsedSeconds])
 
   function newGameHandler(){
-    
+    setTimeElapsedMinues(0)
+    setTimeElapsedSeconds(0)
     setGameOver(false)
     setNewGame()
   }
@@ -40,7 +48,7 @@ export function GameHeader(){
             <>🙂</>
           }
         </button>
-        <p className='header-side-container'>{timeElapsedMinutes}:{timeElapsedSeconds}</p>
+        <p className='header-side-container'>{timeElapsedMinutes}:{addLeadingZeros(timeElapsedSeconds, 2)}</p>
       </div>
     
     </>
