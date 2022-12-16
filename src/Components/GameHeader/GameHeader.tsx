@@ -10,15 +10,17 @@ export function GameHeader(){
   const [isGameOver, setGameOver] = useGameStateStore((state:any) => [state.isGameOver, state.setGameOver])
   const [newGame,setNewGame] = useGameStateStore((state:any) => [state.newGame, state.setNewGame])
 
-  // Methods ================================================================== //
-
   const [timeElapsedMinutes,setTimeElapsedMinues] = useState(0)
   const [timeElapsedSeconds,setTimeElapsedSeconds] = useState(0)
 
-  const [isActive, setIsActive] = useState(false);
+  const [flagsRemaining, setFlagsRemaining] = useGameStateStore((state:any) => [state.flagsRemaining,state.setFlagsRemaining])
+
+  const [playerWon, setPlayerWon] = useGameStateStore((state:any) => [state.playerWon, state.setPlayerWon])
 
   useEffect(()=>{
+    // Start a timer on header load
     const interval = setInterval(() => {
+      // Reset to 0 after 59
       if (timeElapsedSeconds > 58){
         setTimeElapsedSeconds(0)
         setTimeElapsedMinues(timeElapsedMinutes + 1)
@@ -29,23 +31,37 @@ export function GameHeader(){
     return () => clearInterval(interval);
   },[timeElapsedSeconds])
 
+  // Methods ================================================================== //
+
   function newGameHandler(){
+    
     setTimeElapsedMinues(0)
     setTimeElapsedSeconds(0)
+
     setGameOver(false)
+
+    setFlagsRemaining(8)
+
     setNewGame()
   }
+
+  // Render ================================================================== //
+
   return(
     <>
     
       <div className="game-header-container flex-between">
-        <p className='header-side-container'>0  🚩</p>
+        <p className='header-side-container'>{flagsRemaining}  🚩</p>
         <button className='header-center-button' onClick={newGameHandler}>
-          {!isGameOver &&
+          {(!isGameOver && !playerWon) &&
             <>🙂</>
           }
           {isGameOver &&
-            <>🙂</>
+            <>☠️</>
+          }
+
+          {playerWon && 
+            <>😎</>
           }
         </button>
         <p className='header-side-container'>{timeElapsedMinutes}:{addLeadingZeros(timeElapsedSeconds, 2)}</p>

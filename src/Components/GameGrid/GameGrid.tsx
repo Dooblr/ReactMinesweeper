@@ -11,13 +11,18 @@ export function GameGrid(){
 
   const [gameState,setGameState] = useGameStateStore((state:any) => [state.gameState, state.setGameState])
 
-  const [mineCoordinates, setMineCoordinates] = useGameStateStore((state:any) => [state.mineCoordinates, state.setMineCoordinates])
+  const mineCoordinates = useGameStateStore((state:any) => state.mineCoordinates)
 
-  const [isGameOver, setGameOver] = useGameStateStore((state:any) => [state.isGameOver, state.setGameOver])
+  const setGameOver = useGameStateStore((state:any) => state.setGameOver)
   
-  const [newGame] = useGameStateStore((state:any) => [state.newGame])
+  const newGame = useGameStateStore((state:any) => state.newGame)
 
-  // Watchers ======= //
+  const [flagsRemaining, setFlagsRemaining] = useGameStateStore((state:any) => [state.flagsRemaining,state.setFlagsRemaining])
+
+  const setPlayerWon = useGameStateStore((state:any) => state.setPlayerWon)
+
+  // Watchers ================================================================ //
+
 
   useEffect(()=>{
     setGameState(
@@ -32,7 +37,16 @@ export function GameGrid(){
         ['blank','blank','blank','blank','blank','blank','blank','blank']
       ]
     )
-  },[newGame])
+  },[newGame,setGameState])
+
+  // const [reload,setReload] = useState(false)
+
+  useEffect(()=>{
+    // win condition
+    // console.log(multiArrayContainsArray(mineCoordinates,[0,0]));
+    
+    
+  },[])
   
   // Handlers ================================================================== //
   
@@ -49,7 +63,7 @@ export function GameGrid(){
     let tempGameState = gameState
     
     // Click
-    if (clickDuration <= 300){
+    if (clickDuration <= 150){
       handleCellClick(rowIndex,columnIndex)
     } 
     // Long press
@@ -57,19 +71,27 @@ export function GameGrid(){
       // Do nothing if it's a numbered cell
       if ( isNaN(parseInt(cellText)) ){
         // if it's a flag return it to blank
-        if (tempGameState[rowIndex][columnIndex] === 'flag'){
+        if ((tempGameState[rowIndex][columnIndex] === 'flag') ){
           tempGameState[rowIndex][columnIndex] = 'blank'
-        } else {
+          setFlagsRemaining(flagsRemaining + 1)
+        } else if (flagsRemaining > 0) {
           // Set it to flag state
           tempGameState[rowIndex][columnIndex] = 'flag'
+          setFlagsRemaining(flagsRemaining - 1)
         }
         // Update state
         setGameState(tempGameState)
+        // setReload(!reload)
       }
     }
   }
 
   function handleCellClick(rowIndex:number, columnIndex:number){
+
+    // Do nothing if flag
+    if(gameState[rowIndex][columnIndex] === 'flag'){
+      return
+    }
 
     // if a mine is not hit, continue with numbering fn
     let playerDied = false
@@ -103,11 +125,44 @@ export function GameGrid(){
 
       // set cell state to number of surrounding mines
       setGameState(tempGameState)
-    } 
+    
+      // If all of the non-mine coordinates have been un-blanked, set player won
+      const nonMineCoords = getNonMineCells()
+      if(!nonMineCoords.includes('blank')){ 
+        setPlayerWon(true) 
+        // Replace any remaining blank cells with flags after win
+        replaceBlanksWithFlags()
+        setFlagsRemaining(0)
+      }
+    }
+  }
+
+  function replaceBlanksWithFlags(){
+    let tempGameState2 = gameState
+    tempGameState2.forEach((row:[],rowIndex:number)=>{
+      row.forEach((cellText:string,columnIndex:number)=>{
+        if(cellText === 'blank'){
+          tempGameState2[rowIndex][columnIndex] = 'flag'
+        }
+      })
+    })
+    setGameState(tempGameState2)
+  }
+
+  function getNonMineCells(){
+    // Get all cells that aren't mines
+    let nonMineCoords:any[] = []
+    gameState.forEach((row:any,rowIndex:any) => {
+      row.forEach((column:any,columnIndex:any)=>{
+      if(!multiArrayContainsArray(mineCoordinates,[rowIndex,columnIndex])){
+        nonMineCoords.push(gameState[rowIndex][columnIndex])
+      }
+      })
+    })
+    return nonMineCoords
   }
 
   function gameOver(){
-    console.log('game over!');
     let tempGameState = gameState
     mineCoordinates.forEach((mineCoord:[number,number])=>{
       const row = mineCoord[0]
@@ -116,7 +171,6 @@ export function GameGrid(){
       if (tempGameState[row][column] !== 'explosion'){
         tempGameState[row][column] = 'mine'
       }
-      
       setGameState(tempGameState)
     })
     
@@ -225,13 +279,13 @@ export function GameGrid(){
               {row.map((cellText:any,columnIndex:any)=>{
                 
                 return (
-                  <button key={uuidv4()} className='cell-button' onMouseDown={handleCellMouseDown} onMouseUp={()=>handleCellMouseUp(rowIndex,columnIndex,cellText)} >
-                    {cellText === 'mine' && <div className='cell'> <img className='mine-img' src={mineImage}/> </div>}
-                    {cellText === 'explosion' && <div className='cell'> <img className='explosion-img' src={explosionImage}/> </div>}
+                  <button key={uuidv4()} className='cell-button' onMouseDown={handleCellMouseDown} onMouseUp={()=>handleCellMouseUp(rowIndex,columnIndex,cellText)} onTouchStart={()=>{console.log('start');}} onTouchEnd={()=>{console.log('start');}}>
+                    {cellText === 'mine' && <div className='cell'> <img alt='' className='mine-img' src={mineImage}/> </div>}
+                    {cellText === 'explosion' && <div className='cell'> <img alt='' className='explosion-img' src={explosionImage}/> </div>}
                     {cellText === 'blank' && <div className='cell'> </div>}
                     {cellText === 'clicked' && <div className='cell cell-clicked'> </div>}
                     {!isNaN(parseInt(cellText)) && renderNumberedCellDiv(cellText)}
-                    {cellText === 'flag' && <div className='cell cell-flag'> <img className='flag-img' src={flagImage}/> </div>}
+                    {cellText === 'flag' && <div className='cell cell-flag'> <img alt='' className='flag-img' src={flagImage}/> </div>}
                   </button>
                   
                 )

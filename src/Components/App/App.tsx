@@ -5,11 +5,11 @@ import { GameHeader } from '../GameHeader/GameHeader';
 import './App.css';
 
 function App() {
-  
+
   // Render ================================================================== //
 
   return (
-    <div className="App">
+    <div className="App" onContextMenu={()=>{return false}} onSelect={()=>{return false}} onCopy={()=>{return false}} onCut={()=>{return false}} onPaste={()=>{return false}}>
       {/* <header className="App-header">
       </header> */}
       <div className='app-container'>
