@@ -9,21 +9,27 @@ export function GameGrid(){
 
   // State ================================================================== //
 
+  // Zustand
+
   const [gameState,setGameState] = useGameStateStore((state:any) => [state.gameState, state.setGameState])
-
   const mineCoordinates = useGameStateStore((state:any) => state.mineCoordinates)
-
   const setGameOver = useGameStateStore((state:any) => state.setGameOver)
-  
   const newGame = useGameStateStore((state:any) => state.newGame)
-
   const [flagsRemaining, setFlagsRemaining] = useGameStateStore((state:any) => [state.flagsRemaining,state.setFlagsRemaining])
-
   const setPlayerWon = useGameStateStore((state:any) => state.setPlayerWon)
 
-  // Watchers ================================================================ //
+  // Local state
 
+  const [mouseIsDown, setMouseIsDown] = useState(false)
+  const [mouseDownCell,setMouseDownCell] = useState({cellText:'',rowIndex:0,columnIndex:0})
+  const [longPressIntervalID,setLongPressIntervalID] = useState(setInterval(()=>{}))
+  const [exceededLongPress,setExceededLongPress] = useState(false)
+  const [firstRun,setFirstRun] = useState(true)
+  const [mouseDownTime,setMouseDownTime] = useState(0)
 
+  // useEffect ================================================================ //
+
+  // Game board is for UI and does not contain the mine locations. Mine locations are generated in Stores with initial state
   useEffect(()=>{
     setGameState(
       [
@@ -39,50 +45,71 @@ export function GameGrid(){
     )
   },[newGame,setGameState])
 
-  // const [reload,setReload] = useState(false)
-
+  // Long press watcher
   useEffect(()=>{
-    // win condition
-    // console.log(multiArrayContainsArray(mineCoordinates,[0,0]));
+
+    const cellText = mouseDownCell.cellText
+    const rowIndex = mouseDownCell.rowIndex
+    const columnIndex = mouseDownCell.columnIndex
+
+    if(exceededLongPress){
+      clearInterval(longPressIntervalID)
+      addFlagToCell(cellText,rowIndex,columnIndex)
+    }
+
+  },[exceededLongPress,mouseDownCell])
+
+  // Skip first run, watch for mouse events
+  useEffect(()=>{
+
+    if(!firstRun){
+      // Reset long press watcher
+      setExceededLongPress(false)
+      
+      // press interval elapsed
+      let duration = 0
+  
+      if (mouseIsDown){
+        setMouseDownTime(Date.now())
+        // Set the interval ID so it can be cancelled in mouseup block. Annoying but necessary to use state here...
+        setLongPressIntervalID(
+          setInterval(()=>{
+            duration++
+            if (duration >= 75) {
+              setExceededLongPress(true)
+            }
+          },1)
+        ) 
+      // Mouse Up watch
+      } else if (!mouseIsDown) {
+        // Stop mousedown duration interval
+        clearInterval(longPressIntervalID)
+      }
+    }
+
+    setFirstRun(false)
     
-    
-  },[])
+  },[mouseIsDown,mouseDownCell])
   
   // Handlers ================================================================== //
   
-  // Set current time on mousedown. If ms exceeds 100 has transpired since mousedown, register as long press
-  const [mouseDownTime,setMouseDownTime] = useState(0)
-  function handleCellMouseDown(){ setMouseDownTime(Date.now()) }
+  // Set current time on mousedown. If ms exceeds 150 has transpired since mousedown, register as long press
+  function handleCellMouseDown(rowIndex:number, columnIndex:number, cellText:string){ 
+    setMouseIsDown(true)
+    
+    setMouseDownCell({rowIndex:rowIndex,
+                      columnIndex:columnIndex,
+                      cellText:cellText})
+  }
   
   function handleCellMouseUp(rowIndex:number, columnIndex:number, cellText:string){
 
+    setMouseIsDown(false)
+    
     // Get the ms since mousedown
     const clickDuration = Date.now() - mouseDownTime
-
-    // Create a copy of the game state
-    let tempGameState = gameState
-    
-    // Click
-    if (clickDuration <= 150){
+    if (clickDuration <= 75){
       handleCellClick(rowIndex,columnIndex)
-    } 
-    // Long press
-    else {
-      // Do nothing if it's a numbered cell
-      if ( isNaN(parseInt(cellText)) ){
-        // if it's a flag return it to blank
-        if ((tempGameState[rowIndex][columnIndex] === 'flag') ){
-          tempGameState[rowIndex][columnIndex] = 'blank'
-          setFlagsRemaining(flagsRemaining + 1)
-        } else if (flagsRemaining > 0) {
-          // Set it to flag state
-          tempGameState[rowIndex][columnIndex] = 'flag'
-          setFlagsRemaining(flagsRemaining - 1)
-        }
-        // Update state
-        setGameState(tempGameState)
-        // setReload(!reload)
-      }
     }
   }
 
@@ -135,31 +162,6 @@ export function GameGrid(){
         setFlagsRemaining(0)
       }
     }
-  }
-
-  function replaceBlanksWithFlags(){
-    let tempGameState2 = gameState
-    tempGameState2.forEach((row:[],rowIndex:number)=>{
-      row.forEach((cellText:string,columnIndex:number)=>{
-        if(cellText === 'blank'){
-          tempGameState2[rowIndex][columnIndex] = 'flag'
-        }
-      })
-    })
-    setGameState(tempGameState2)
-  }
-
-  function getNonMineCells(){
-    // Get all cells that aren't mines
-    let nonMineCoords:any[] = []
-    gameState.forEach((row:any,rowIndex:any) => {
-      row.forEach((column:any,columnIndex:any)=>{
-      if(!multiArrayContainsArray(mineCoordinates,[rowIndex,columnIndex])){
-        nonMineCoords.push(gameState[rowIndex][columnIndex])
-      }
-      })
-    })
-    return nonMineCoords
   }
 
   function gameOver(){
@@ -245,6 +247,51 @@ export function GameGrid(){
     return adjacentMineCount
   }
 
+  function addFlagToCell(cellText:string,rowIndex:number,columnIndex:number){
+    let tempGameState = gameState
+    // Do nothing if it's a numbered cell
+    if ( isNaN(parseInt(cellText)) ){
+      // if it's a flag return it to blank
+      if ((tempGameState[rowIndex][columnIndex] === 'flag') ){
+        tempGameState[rowIndex][columnIndex] = 'blank'
+        setFlagsRemaining(flagsRemaining + 1)
+      } else if (flagsRemaining > 0) {
+        // Set it to flag state
+        tempGameState[rowIndex][columnIndex] = 'flag'
+        setFlagsRemaining(flagsRemaining - 1)
+      }
+      // Update state
+      setGameState(tempGameState)
+    }
+  }
+
+  // Get all cells on the board that don't have mines
+  function getNonMineCells(){
+    // Get all cells that aren't mines
+    let nonMineCoords:any[] = []
+    gameState.forEach((row:any,rowIndex:any) => {
+      row.forEach((column:any,columnIndex:any)=>{
+      if(!multiArrayContainsArray(mineCoordinates,[rowIndex,columnIndex])){
+        nonMineCoords.push(gameState[rowIndex][columnIndex])
+      }
+      })
+    })
+    return nonMineCoords
+  }
+
+  // After victory, replace any blank mine spaces with flags
+  function replaceBlanksWithFlags(){
+    let tempGameState2 = gameState
+    tempGameState2.forEach((row:[],rowIndex:number)=>{
+      row.forEach((cellText:string,columnIndex:number)=>{
+        if(cellText === 'blank'){
+          tempGameState2[rowIndex][columnIndex] = 'flag'
+        }
+      })
+    })
+    setGameState(tempGameState2)
+  }
+
   // Render ================================================================== //
 
   function renderNumberedCellDiv(surroundingMinesCount:string) {
@@ -279,7 +326,13 @@ export function GameGrid(){
               {row.map((cellText:any,columnIndex:any)=>{
                 
                 return (
-                  <button key={uuidv4()} className='cell-button' onMouseDown={handleCellMouseDown} onMouseUp={()=>handleCellMouseUp(rowIndex,columnIndex,cellText)} onTouchStart={()=>{console.log('start');}} onTouchEnd={()=>{console.log('start');}}>
+                  <button key={uuidv4()} className='cell-button' 
+
+                      onMouseDown={()=>{handleCellMouseDown(rowIndex,columnIndex,cellText)}} 
+                      onMouseUp={()=>handleCellMouseUp(rowIndex,columnIndex,cellText)} 
+                      onTouchStart={()=>{handleCellMouseDown(rowIndex,columnIndex,cellText)}} 
+                      onTouchEnd={()=>handleCellMouseUp(rowIndex,columnIndex,cellText)}>
+
                     {cellText === 'mine' && <div className='cell'> <img alt='' className='mine-img' src={mineImage}/> </div>}
                     {cellText === 'explosion' && <div className='cell'> <img alt='' className='explosion-img' src={explosionImage}/> </div>}
                     {cellText === 'blank' && <div className='cell'> </div>}

@@ -8,14 +8,14 @@ export function GameHeader(){
   // State ================================================================== //
   
   const [isGameOver, setGameOver] = useGameStateStore((state:any) => [state.isGameOver, state.setGameOver])
-  const [newGame,setNewGame] = useGameStateStore((state:any) => [state.newGame, state.setNewGame])
+  const setNewGame = useGameStateStore((state:any) => state.setNewGame)
 
   const [timeElapsedMinutes,setTimeElapsedMinues] = useState(0)
   const [timeElapsedSeconds,setTimeElapsedSeconds] = useState(0)
 
   const [flagsRemaining, setFlagsRemaining] = useGameStateStore((state:any) => [state.flagsRemaining,state.setFlagsRemaining])
 
-  const [playerWon, setPlayerWon] = useGameStateStore((state:any) => [state.playerWon, state.setPlayerWon])
+  const [playerWon,setPlayerWon] = useGameStateStore((state:any) => [state.playerWon, state.setPlayerWon])
 
   useEffect(()=>{
     // Start a timer on header load
@@ -28,8 +28,13 @@ export function GameHeader(){
         setTimeElapsedSeconds(timeElapsedSeconds + 1)
       }
     }, 1000);
+
+    // Stop timer if player wins or loses
+    if(playerWon || isGameOver){
+      clearInterval(interval)
+    }
     return () => clearInterval(interval);
-  },[timeElapsedSeconds])
+  },[timeElapsedSeconds, playerWon, isGameOver])
 
   // Methods ================================================================== //
 
@@ -40,6 +45,9 @@ export function GameHeader(){
 
     setGameOver(false)
 
+    setPlayerWon(false)
+
+    // TODO: Dynamic board size
     setFlagsRemaining(8)
 
     setNewGame()
@@ -51,7 +59,7 @@ export function GameHeader(){
     <>
     
       <div className="game-header-container flex-between">
-        <p className='header-side-container'>{flagsRemaining}  🚩</p>
+        <p className='header-side-container flag-points'>{flagsRemaining}  🚩</p>
         <button className='header-center-button' onClick={newGameHandler}>
           {(!isGameOver && !playerWon) &&
             <>🙂</>

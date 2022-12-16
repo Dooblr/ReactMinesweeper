@@ -4,6 +4,10 @@ button {
   appearance: none;
 }
 
+body {
+  overflow-x: hidden;
+}
+
 .App {
   background-color: rgb(26, 32, 52);
   width: 100vw;
@@ -17,7 +21,16 @@ button {
 }
 
 .app-container {
-  margin-top: 20vh;
+  margin-top: 10vh;
+}
+
+#title {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.p-text {
+  color: rgba(255, 255, 255, 0.67);
+  max-width: 20rem;
 }
 
 .cell-button {
