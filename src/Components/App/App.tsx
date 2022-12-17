@@ -45,7 +45,7 @@ function App() {
         {!isApprovedDevice && 
         <>
           <br/><br/><br/>
-          <p className='p-text'>Mobile and Safari are currently unsupported. Please load on a desktop in Chrome, Firefox, or Edge.</p>
+          <p className='p-text'>... is currently unsupported on mobile and Safari. Please load on a desktop in Chrome, Firefox, or Edge. I promise it works.</p>
         </>
         }
 
