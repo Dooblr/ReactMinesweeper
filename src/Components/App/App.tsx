@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { GameGrid } from '../GameGrid/GameGrid';
+import { GameGridMobile } from '../GameGrid/Mobile/GameGridMobile';
 import { GameHeader } from '../GameHeader/GameHeader';
+import { GameHeaderMobile } from '../GameHeader/Mobile/GameHeaderMobile';
 import './App.css';
 
 function App() {
@@ -19,16 +21,14 @@ function App() {
 
   return (
     <div className="App" onContextMenu={()=>{return false}} onSelect={()=>{return false}} onCopy={()=>{return false}} onCut={()=>{return false}} onPaste={()=>{return false}}>
-      {/* <header className="App-header">
-      </header> */}
       <div className='app-container'>
-
         <h1 id='title'>Reactsweeper</h1>
         
         {isApprovedDevice && 
         <>
           <GameHeader/>
           <GameGrid/>
+
           <br/>
           <p className='p-text'>Instructions:</p>
           <p className='p-text'>
@@ -44,13 +44,12 @@ function App() {
 
         {!isApprovedDevice && 
         <>
+          {/* <GameHeaderMobile/>
+          <GameGridMobile/> */}
           <br/><br/><br/>
-          <p className='p-text'>... is currently unsupported on mobile and Safari. Please load on a desktop in Chrome, Firefox, or Edge. I promise it works.</p>
+          <p className='p-text'>Reactsweeper is currently unsupported on mobile and Safari. Please load on a desktop in Chrome, Firefox, or Edge.</p>
         </>
         }
-
-        
-        
       </div>
     </div>
   );

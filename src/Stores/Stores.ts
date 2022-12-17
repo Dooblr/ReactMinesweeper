@@ -27,6 +27,9 @@ export const useGameStateStore = create(set => ({
   flagsRemaining: 8,
   setFlagsRemaining: (newState:any) => set((state:any) => ({ flagsRemaining: newState })),
 
+  flagMode: false,
+  setFlagMode: (newState:any) => set((state:any) => ({ flagMode: newState })),
+
   playerWon: false,
   setPlayerWon: (newState:any) => set((state:any) => ({ playerWon: newState })),
 }))

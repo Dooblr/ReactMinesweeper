@@ -1,6 +1,6 @@
 import './WebkitButton.css'
 
-export function WebKitButton({onTouchStart,
+export function WebkitButton({onTouchStart,
 onTouchEnd,
 onMouseDown,
 onMouseUp,

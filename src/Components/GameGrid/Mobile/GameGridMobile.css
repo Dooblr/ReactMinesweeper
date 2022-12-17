@@ -1,0 +1,41 @@
+.mobile .cell-button {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+.mobile .cell-row {
+  height: 2.5rem;
+}
+.mobile .mine-img {
+  position: absolute;
+  width: 1.5rem;
+  margin-left: -0.75rem;
+  margin-top: -0.6rem;
+}
+.mobile .flag-img {
+  position: absolute;
+  width: 1.5rem;
+  margin-left: -0.75rem;
+  margin-top: -0.75rem;
+}
+.mobile .explosion-img {
+  position: absolute;
+  width: 1.5rem;
+  margin-left: -0.75rem;
+  margin-top: -0.75rem;
+}
+.mobile .cell-number {
+  position: absolute;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: large;
+  font-weight: 900;
+  margin-left: 0.75rem;
+  margin-top: -0.6rem;
+}
+.mobile .cell-clicked {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.25);
+  width: 2rem;
+  height: 2rem;
+  margin-left: 0.1rem;
+  margin-top: -1rem;
+}/*# sourceMappingURL=GameGridMobile.css.map */

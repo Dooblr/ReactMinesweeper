@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react"
-import explosionImage from '../../Assets/explosion.png'
-import flagImage from '../../Assets/flag.png'
-import mineImage from '../../Assets/mine.png'
-import { useGameStateStore } from "../../Stores/Stores"
-import { multiArrayContainsArray, uuidv4 } from "../../utils"
-import './GameGrid.css'
+import { useEffect, useState } from "react";
+import explosionImage from '../../../Assets/explosion.png';
+import flagImage from '../../../Assets/flag.png';
+import mineImage from '../../../Assets/mine.png';
+import { useGameStateStore } from "../../../Stores/Stores";
+import { multiArrayContainsArray, uuidv4 } from "../../../utils";
 
-export function GameGrid(){
+import './GameGridMobile.css'
+import { WebkitButton } from "./WebkitButton/WebkitButton";
+
+export function GameGridMobile(){
 
   // State ================================================================== //
 
@@ -19,6 +21,8 @@ export function GameGrid(){
   const [flagsRemaining, setFlagsRemaining] = useGameStateStore((state:any) => [state.flagsRemaining,state.setFlagsRemaining])
   const setPlayerWon = useGameStateStore((state:any) => state.setPlayerWon)
 
+  const flagMode = useGameStateStore((state:any) => state.flagMode)
+
   // Local state
 
   const [mouseIsDown, setMouseIsDown] = useState(false)
@@ -27,6 +31,8 @@ export function GameGrid(){
   const [exceededLongPress,setExceededLongPress] = useState(false)
   const [firstRun,setFirstRun] = useState(true)
   const [mouseDownTime,setMouseDownTime] = useState(0)
+
+  
 
   // useEffect ================================================================ //
 
@@ -62,37 +68,37 @@ export function GameGrid(){
   },[exceededLongPress,mouseDownCell])
 
   // Skip first run, watch for mouse events
-  useEffect(()=>{
+  // useEffect(()=>{
 
-    if(!firstRun){
-      // Reset long press watcher
-      setExceededLongPress(false)
+  //   if(!firstRun){
+  //     // Reset long press watcher
+  //     setExceededLongPress(false)
       
-      // press interval elapsed
-      let duration = 0
+  //     // press interval elapsed
+  //     let duration = 0
   
-      if (mouseIsDown){
-        setMouseDownTime(Date.now())
-        // Set the interval ID so it can be cancelled in mouseup block. Annoying but necessary to use state here...
-        setLongPressIntervalID(
-          setInterval(()=>{
-            duration++
-            if (duration >= 75) {
+  //     if (mouseIsDown){
+  //       setMouseDownTime(Date.now())
+  //       // Set the interval ID so it can be cancelled in mouseup block. Annoying but necessary to use state here...
+  //       setLongPressIntervalID(
+  //         setInterval(()=>{
+  //           duration++
+  //           if (duration >= 75) {
               
-              setExceededLongPress(true)
-            }
-          },1)
-        ) 
-      // Mouse Up watch
-      } else if (!mouseIsDown) {
-        // Stop mousedown duration interval
-        clearInterval(longPressIntervalID)
-      }
-    }
+  //             setExceededLongPress(true)
+  //           }
+  //         },1)
+  //       ) 
+  //     // Mouse Up watch
+  //     } else if (!mouseIsDown) {
+  //       // Stop mousedown duration interval
+  //       clearInterval(longPressIntervalID)
+  //     }
+  //   }
 
-    setFirstRun(false)
+  //   setFirstRun(false)
     
-  },[mouseIsDown,mouseDownCell])
+  // },[mouseIsDown,mouseDownCell])
   
   // Handlers ================================================================== //
   
@@ -328,26 +334,23 @@ export function GameGrid(){
       {gameState.map((row:any,rowIndex:any)=>{
           
           return(
-            <div key={uuidv4()} className='cell-row'>
+            <div key={uuidv4()} className='cell-row-mobile'>
               {row.map((cellText:any,columnIndex:any)=>{
                 
                 return (
 
-                  <button key={uuidv4()} className='cell-button'
+                  <WebkitButton key={uuidv4()} className='cell-button mobile'
                       onTouchStart={()=>handleCellMouseDown(rowIndex,columnIndex,cellText)} 
                       onTouchEnd={()=>handleCellMouseUp(rowIndex,columnIndex,cellText)} 
-                      onMouseDown={()=>handleCellMouseDown(rowIndex,columnIndex,cellText)} 
-                      onMouseUp={()=>handleCellMouseUp(rowIndex,columnIndex,cellText)} 
-                      
                       >
 
-                    {cellText === 'mine' && <div className='cell'> <img alt='' className='mine-img' src={mineImage}/> </div>}
-                    {cellText === 'explosion' && <div className='cell'> <img alt='' className='explosion-img' src={explosionImage}/> </div>}
-                    {cellText === 'blank' && <div className='cell'> </div>}
-                    {cellText === 'clicked' && <div className='cell cell-clicked'> </div>}
+                    {cellText === 'mine' && <div className='cell-mobile'> <img alt='' className='mine-img-mobile' src={mineImage}/> </div>}
+                    {cellText === 'explosion' && <div className='cell-mobile'> <img alt='' className='explosion-img-mobile' src={explosionImage}/> </div>}
+                    {cellText === 'blank' && <div className='cell-mobile'> </div>}
+                    {cellText === 'clicked' && <div className='cell-mobile cell-clicked-mobile'> </div>}
                     {!isNaN(parseInt(cellText)) && renderNumberedCellDiv(cellText)}
-                    {cellText === 'flag' && <div className='cell cell-flag'> <img alt='' className='flag-img' src={flagImage}/> </div>}
-                  </button>
+                    {cellText === 'flag' && <div className='cell-mobile cell-flag-mobile'> <img alt='' className='flag-img-mobile' src={flagImage}/> </div>}
+                  </WebkitButton>
                   
                 )
               })}
