@@ -2,6 +2,19 @@ button{
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+  border-radius: 0;
+  -webkit-border-radius:0px;
+}
+
+input, textarea {
+  -webkit-border-radius:0px;
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+
+input[type="button"] {
+  -webkit-appearance: none;
+  
 }
 
 body{
@@ -18,6 +31,8 @@ body{
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */
+  -webkit-user-drag: none;
+  
 }
 
 .app-container{

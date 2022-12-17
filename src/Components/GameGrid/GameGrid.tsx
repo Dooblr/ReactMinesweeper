@@ -4,6 +4,7 @@ import flagImage from '../../Assets/flag.png';
 import mineImage from '../../Assets/mine.png';
 import { useGameStateStore } from "../../Stores/Stores";
 import { multiArrayContainsArray, uuidv4 } from "../../utils";
+import { WebKitButton } from "../App/WebkitButton";
 
 export function GameGrid(){
 
@@ -31,6 +32,7 @@ export function GameGrid(){
 
   // Game board is for UI and does not contain the mine locations. Mine locations are generated in Stores with initial state
   useEffect(()=>{
+
     setGameState(
       [
         ['blank','blank','blank','blank','blank','blank','blank','blank'],
@@ -76,6 +78,7 @@ export function GameGrid(){
           setInterval(()=>{
             duration++
             if (duration >= 75) {
+              
               setExceededLongPress(true)
             }
           },1)
@@ -95,6 +98,9 @@ export function GameGrid(){
   
   // Set current time on mousedown. If ms exceeds 150 has transpired since mousedown, register as long press
   function handleCellMouseDown(rowIndex:number, columnIndex:number, cellText:string){ 
+
+    console.log('cell',rowIndex,columnIndex);
+    
     setMouseIsDown(true)
     
     setMouseDownCell({rowIndex:rowIndex,
@@ -326,12 +332,14 @@ export function GameGrid(){
               {row.map((cellText:any,columnIndex:any)=>{
                 
                 return (
-                  <button key={uuidv4()} className='cell-button' 
 
-                      onMouseDown={()=>{handleCellMouseDown(rowIndex,columnIndex,cellText)}} 
+                  <button key={uuidv4()} className='cell-button'
+                      onTouchStart={()=>handleCellMouseDown(rowIndex,columnIndex,cellText)} 
+                      onTouchEnd={()=>handleCellMouseUp(rowIndex,columnIndex,cellText)} 
+                      onMouseDown={()=>handleCellMouseDown(rowIndex,columnIndex,cellText)} 
                       onMouseUp={()=>handleCellMouseUp(rowIndex,columnIndex,cellText)} 
-                      onTouchStart={()=>{handleCellMouseDown(rowIndex,columnIndex,cellText)}} 
-                      onTouchEnd={()=>handleCellMouseUp(rowIndex,columnIndex,cellText)}>
+                      
+                      >
 
                     {cellText === 'mine' && <div className='cell'> <img alt='' className='mine-img' src={mineImage}/> </div>}
                     {cellText === 'explosion' && <div className='cell'> <img alt='' className='explosion-img' src={explosionImage}/> </div>}

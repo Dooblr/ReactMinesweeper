@@ -1,0 +1,12 @@
+.my-webkit-button{
+  display:inline-block;
+  height:2rem;
+  width:2rem;
+  user-select: none;
+  background-color: white;
+  border:1px solid gray
+}
+
+.my-webkit-button:active{
+  background-color: lightgray;
+}
